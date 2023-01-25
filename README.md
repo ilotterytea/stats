@@ -1,0 +1,2 @@
+# stats [![build badge](https://github.com/ilotterytea/stats/actions/workflows/release.yml/badge.svg)](https://github.com/ilotterytea/stats/actions/workflows/release.yml)
+Microservice for analyzing Twitch messages for further separation by word usage, third-party emotes.
