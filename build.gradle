@@ -31,6 +31,8 @@ dependencies {
 
     implementation("io.micronaut:micronaut-validation")
     implementation("com.github.twitch4j:twitch4j:1.13.0")
+    implementation("org.java-websocket:Java-WebSocket:1.5.3")
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
 
 }
 
