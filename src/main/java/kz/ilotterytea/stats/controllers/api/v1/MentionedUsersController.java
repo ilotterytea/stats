@@ -41,7 +41,7 @@ public class MentionedUsersController {
                 .body(new Payload<>(
                         HttpStatus.OK.getCode(),
                         "Success!",
-                        target.getMentionedUsers()
+                        target.getMentionedUsersHistory()
                 ));
     }
 }

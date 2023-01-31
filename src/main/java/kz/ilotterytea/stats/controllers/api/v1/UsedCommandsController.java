@@ -41,7 +41,7 @@ public class UsedCommandsController {
                 .body(new Payload<>(
                         HttpStatus.OK.getCode(),
                         "Success!",
-                        target.getUsedCommands()
+                        target.getUsedCommandsHistory()
                 ));
     }
 }

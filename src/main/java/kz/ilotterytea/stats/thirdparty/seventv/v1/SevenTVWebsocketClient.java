@@ -16,10 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 /**
  * 7TV WebSocket client.
@@ -49,6 +46,9 @@ public class SevenTVWebsocketClient extends WebSocketClient {
     public void onMessage(String message) {
         Server server = Server.getInstance();
         Message msg = new Gson().fromJson(message, Message.class);
+        final String date = Calendar.getInstance().get(Calendar.YEAR) + "-" +
+                Calendar.getInstance().get(Calendar.MONTH) + "-" +
+                Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 
         if (Objects.equals(msg.getAction(), "update")) {
             EmoteEventUpdate update = new Gson().fromJson(
@@ -83,7 +83,9 @@ public class SevenTVWebsocketClient extends WebSocketClient {
                             new Emote(
                                     Provider.SEVENTV,
                                     update.getEmoteId(),
+                                    new HashMap<>(),
                                     update.getName(),
+                                    new HashMap<>(),
                                     0,
                                     false,
                                     false
@@ -101,6 +103,9 @@ public class SevenTVWebsocketClient extends WebSocketClient {
                 }
                 case "UPDATE": {
                     if (emotes.containsKey(update.getEmoteId())) {
+                        ArrayList<String> names = emotes.get(update.getEmoteId()).getProviderNameHistory().getOrDefault(date, new ArrayList<>());
+                        names.add(update.getName());
+                        emotes.get(update.getEmoteId()).getProviderNameHistory().put(date, names);
                         emotes.get(update.getEmoteId()).setProviderName(update.getName());
                         LOG.debug("Updated the name for Emote ID " + update.getEmoteId() + " for Target ID " + server.getTargetIds().get(update.getChannel()) + "!");
                     }

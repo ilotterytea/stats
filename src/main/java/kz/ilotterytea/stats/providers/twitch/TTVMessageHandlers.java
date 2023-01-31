@@ -6,9 +6,7 @@ import kz.ilotterytea.stats.models.Target;
 import kz.ilotterytea.stats.models.emotes.Emote;
 import kz.ilotterytea.stats.models.emotes.Provider;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author ilotterytea
@@ -25,6 +23,9 @@ public class TTVMessageHandlers {
         Target target = server.getTargetController().getOrDefault(event.getChannel().getId());
         String msg = event.getMessage().get();
         ArrayList<String> sMsg = new ArrayList<>(Arrays.asList(msg.split(" ")));
+        final String date = Calendar.getInstance().get(Calendar.YEAR) + "-" +
+                Calendar.getInstance().get(Calendar.MONTH) + "-" +
+                Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
 
         // Command
         if (
@@ -32,10 +33,9 @@ public class TTVMessageHandlers {
                         // Supibot support:
                         sMsg.get(0).startsWith("$")
         ) {
-            target.getUsedCommands().put(
-                    sMsg.get(0),
-                    target.getUsedCommands().getOrDefault(sMsg.get(0), 0) + 1
-            );
+            Map<String, Integer> record = target.getUsedCommandsHistory().getOrDefault(sMsg.get(0), new HashMap<>());
+            record.put(date, record.getOrDefault(date, 0) + 1);
+            target.getUsedCommandsHistory().put(sMsg.get(0), record);
         }
 
         for (String w : sMsg) {
@@ -48,19 +48,19 @@ public class TTVMessageHandlers {
                     .findFirst().orElse(null);
 
             if (emote != null) {
+                emote.getCountHistory().put(date, emote.getCountHistory().getOrDefault(date, 0) + 1);
                 emote.setCount(emote.getCount() + 1);
                 target.getEmotes().get(Provider.SEVENTV).put(emote.getProviderId(), emote);
             }
 
             // Mention
             if (w.startsWith("@")) {
-                target.getMentionedUsers().put(
-                        w,
-                        target.getMentionedUsers().getOrDefault(w, 0) + 1
-                );
+                Map<String, Integer> record = target.getMentionedUsersHistory().getOrDefault(w, new HashMap<>());
+                record.put(date, record.getOrDefault(date, 0) + 1);
+                target.getMentionedUsersHistory().put(w, record);
             }
         }
 
-        target.setTotalMessagesCount(target.getTotalMessagesCount() + 1);
+        target.getMessageCountHistory().put(date, target.getMessageCountHistory().getOrDefault(date, 0) + 1);
     }
 }

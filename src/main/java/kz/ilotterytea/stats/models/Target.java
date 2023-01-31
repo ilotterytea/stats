@@ -14,31 +14,31 @@ public class Target {
     private final String aliasId;
     private final Map<Provider, Map<String, Emote>> emotes;
 
-    private final Map<String, Integer> mentionedUsers;
-    private final Map<String, Integer> usedCommands;
-    private long totalMessagesCount;
+    private final Map<String, Map<String, Integer>> mentionedUsersHistory;
+    private final Map<String, Map<String, Integer>> usedCommandsHistory;
+    private final Map<String, Integer> messageCountHistory;
 
     public Target(
             String aliasId,
             Map<Provider, Map<String, Emote>> emotes,
-            Map<String, Integer> mentionedUsers,
-            Map<String, Integer> usedCommands,
-            long totalMessagesCount
+            Map<String, Map<String, Integer>> mentionedUsersHistory,
+            Map<String, Map<String, Integer>> usedCommandsHistory,
+            Map<String, Integer> messageCountHistory
     ) {
         this.aliasId = aliasId;
         this.emotes = emotes;
-        this.mentionedUsers = mentionedUsers;
-        this.usedCommands = usedCommands;
-        this.totalMessagesCount = totalMessagesCount;
+        this.mentionedUsersHistory = mentionedUsersHistory;
+        this.usedCommandsHistory = usedCommandsHistory;
+        this.messageCountHistory = messageCountHistory;
     }
 
     public Target(String aliasId) {
         this.aliasId = aliasId;
 
         this.emotes = new HashMap<>();
-        this.mentionedUsers = new HashMap<>();
-        this.usedCommands = new HashMap<>();
-        this.totalMessagesCount = 0;
+        this.messageCountHistory = new HashMap<>();
+        this.usedCommandsHistory = new HashMap<>();
+        this.mentionedUsersHistory = new HashMap<>();
     }
 
     public String getAliasId() {
@@ -49,19 +49,15 @@ public class Target {
         return emotes;
     }
 
-    public Map<String, Integer> getMentionedUsers() {
-        return mentionedUsers;
+    public Map<String, Map<String, Integer>> getMentionedUsersHistory() {
+        return mentionedUsersHistory;
     }
 
-    public Map<String, Integer> getUsedCommands() {
-        return usedCommands;
+    public Map<String, Map<String, Integer>> getUsedCommandsHistory() {
+        return usedCommandsHistory;
     }
 
-    public long getTotalMessagesCount() {
-        return totalMessagesCount;
-    }
-
-    public void setTotalMessagesCount(long totalMessagesCount) {
-        this.totalMessagesCount = totalMessagesCount;
+    public Map<String, Integer> getMessageCountHistory() {
+        return messageCountHistory;
     }
 }
