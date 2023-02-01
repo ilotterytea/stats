@@ -63,6 +63,13 @@ public class Server {
         }
         targetController = new TargetController(SharedConstants.TARGETS_PATH);
 
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                targetController.save();
+            }
+        }, 300000, 300000);
+
         if (
                         !Objects.equals(properties.getProperty("TTV_CLIENT_ID", null), null) &&
                         !Objects.equals(properties.getProperty("TTV_ACCESS_TOKEN", null), null)
