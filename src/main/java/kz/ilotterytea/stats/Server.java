@@ -45,6 +45,7 @@ public class Server {
 
     public void init() {
         properties = new Properties();
+        targetIds = new HashMap<>();
 
         // Load properties:
         if (new File(SharedConstants.PROPERTIES_PATH).exists()) {
