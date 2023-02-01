@@ -1,6 +1,5 @@
 package kz.ilotterytea.stats;
 
-import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.chat.events.channel.IRCMessageEvent;
@@ -34,9 +33,6 @@ public class Server {
     private TwitchClient twitchClient;
     public TwitchClient getTwitchClient() { return twitchClient; }
 
-    public OAuth2Credential twitchCredential;
-    public OAuth2Credential getTwitchCredential() { return twitchCredential; }
-
     private TargetController targetController;
     public TargetController getTargetController() { return targetController; }
 
@@ -67,14 +63,11 @@ public class Server {
         targetController = new TargetController(SharedConstants.TARGETS_PATH);
 
         if (
-                !Objects.equals(properties.getProperty("TTV_OAUTH2_TOKEN", null), null) &&
                         !Objects.equals(properties.getProperty("TTV_CLIENT_ID", null), null) &&
                         !Objects.equals(properties.getProperty("TTV_ACCESS_TOKEN", null), null)
         ) {
-            twitchCredential = new OAuth2Credential("twitch", properties.getProperty("TTV_OAUTH2_TOKEN"));
             twitchClient = TwitchClientBuilder.builder()
                     .withClientId(properties.getProperty("TTV_CLIENT_ID"))
-                    .withChatAccount(twitchCredential)
                     .withEnableHelix(true)
                     .withEnableChat(true)
                     .build();
