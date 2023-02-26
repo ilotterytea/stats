@@ -84,15 +84,17 @@ public class Server {
 
             List<User> helixTargets = new ArrayList<>();
 
-            helixTargets.addAll(
-                    twitchClient.getHelix().getUsers(
-                            properties.getProperty("TTV_ACCESS_TOKEN"),
-                            targetController.getTargets().values()
-                                    .stream().map(Target::getAliasId)
-                                    .collect(Collectors.toList()),
-                            null
-                    ).execute().getUsers()
-            );
+            if (targetController.getTargets().size() > 0) {
+                helixTargets.addAll(
+                        twitchClient.getHelix().getUsers(
+                                properties.getProperty("TTV_ACCESS_TOKEN"),
+                                targetController.getTargets().values()
+                                        .stream().map(Target::getAliasId)
+                                        .collect(Collectors.toList()),
+                                null
+                        ).execute().getUsers()
+                );
+            }
 
             for (User user : helixTargets) {
                 twitchClient.getChat().joinChannel(user.getLogin());
