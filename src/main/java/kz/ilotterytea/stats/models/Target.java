@@ -18,18 +18,22 @@ public class Target {
     private final Map<String, Map<String, Integer>> usedCommandsHistory;
     private final Map<String, Integer> messageCountHistory;
 
+    private final Map<String, Boolean> activeHistory;
+
     public Target(
             String aliasId,
             Map<Provider, Map<String, Emote>> emotes,
             Map<String, Map<String, Integer>> mentionedUsersHistory,
             Map<String, Map<String, Integer>> usedCommandsHistory,
-            Map<String, Integer> messageCountHistory
+            Map<String, Integer> messageCountHistory,
+            Map<String, Boolean> activeHistory
     ) {
         this.aliasId = aliasId;
         this.emotes = emotes;
         this.mentionedUsersHistory = mentionedUsersHistory;
         this.usedCommandsHistory = usedCommandsHistory;
         this.messageCountHistory = messageCountHistory;
+        this.activeHistory = activeHistory;
     }
 
     public Target(String aliasId) {
@@ -39,6 +43,7 @@ public class Target {
         this.messageCountHistory = new HashMap<>();
         this.usedCommandsHistory = new HashMap<>();
         this.mentionedUsersHistory = new HashMap<>();
+        this.activeHistory = new HashMap<>();
     }
 
     public String getAliasId() {
@@ -59,5 +64,9 @@ public class Target {
 
     public Map<String, Integer> getMessageCountHistory() {
         return messageCountHistory;
+    }
+
+    public Map<String, Boolean> getActiveHistory() {
+        return activeHistory;
     }
 }
