@@ -1,6 +1,0 @@
-applicationType: default
-defaultPackage: kz.ilotterytea.stats
-testFramework: junit
-sourceLanguage: java
-buildTool: gradle
-features: [annotation-api, app-name, data, data-jdbc, flyway, graalvm, gradle, http-client, java, java-application, jdbc-hikari, junit, logback, micronaut-build, mysql, netty-server, openapi, readme, serialization-jackson, shade, swagger-ui, test-resources, yaml]
