@@ -2,10 +2,13 @@ package kz.ilotterytea.stats.entities.emotes;
 
 import jakarta.persistence.*;
 import kz.ilotterytea.stats.entities.Channel;
+import kz.ilotterytea.stats.entities.stats.EmoteStats;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author ilotterytea
@@ -58,6 +61,9 @@ public class Emote {
     @Column(name = "updated_at")
     private Date updateTimestamp;
 
+    @OneToMany(mappedBy = "emote", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    private Set<EmoteStats> emoteStats;
+
     public Emote(String providerId, EmoteProvider provider, String name) {
         this.providerId = providerId;
         this.provider = provider;
@@ -65,6 +71,7 @@ public class Emote {
         this.usedTimes = 0;
         this.isDeleted = false;
         this.isGlobal = false;
+        this.emoteStats = new HashSet<>();
     }
 
     public Integer getId() {
@@ -137,5 +144,25 @@ public class Emote {
 
     public void setDeletionTimestamp(Date deletionTimestamp) {
         this.deletionTimestamp = deletionTimestamp;
+    }
+
+    public Set<EmoteStats> getEmoteStats() {
+        return emoteStats;
+    }
+
+    public void setEmoteStats(Set<EmoteStats> emoteStats) {
+        for (EmoteStats stats : emoteStats) {
+            stats.setEmote(this);
+        }
+        this.emoteStats = emoteStats;
+    }
+
+    public boolean addEmoteStats(EmoteStats emoteStats) {
+        emoteStats.setEmote(this);
+        return this.emoteStats.add(emoteStats);
+    }
+
+    public boolean removeEmoteStats(EmoteStats emoteStats) {
+        return this.emoteStats.remove(emoteStats);
     }
 }

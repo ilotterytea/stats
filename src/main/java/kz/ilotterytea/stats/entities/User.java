@@ -1,10 +1,7 @@
 package kz.ilotterytea.stats.entities;
 
 import jakarta.persistence.*;
-import kz.ilotterytea.stats.entities.stats.CommandStats;
-import kz.ilotterytea.stats.entities.stats.HashtagStats;
-import kz.ilotterytea.stats.entities.stats.MentionStats;
-import kz.ilotterytea.stats.entities.stats.WordStats;
+import kz.ilotterytea.stats.entities.stats.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
@@ -45,6 +42,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     private Set<MentionStats> mentionStats;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    private Set<EmoteStats> emoteStats;
+
     public User(Integer aliasId, String aliasName) {
         this.aliasId = aliasId;
         this.aliasName = aliasName;
@@ -52,6 +52,7 @@ public class User {
         this.hashtagStats = new HashSet<>();
         this.wordStats = new HashSet<>();
         this.mentionStats = new HashSet<>();
+        this.emoteStats = new HashSet<>();
     }
 
     public Integer getId() {
@@ -152,5 +153,25 @@ public class User {
 
     public boolean removeMentionStats(MentionStats mentionStats) {
         return this.mentionStats.remove(mentionStats);
+    }
+
+    public Set<EmoteStats> getEmoteStats() {
+        return emoteStats;
+    }
+
+    public void setEmoteStats(Set<EmoteStats> emoteStats) {
+        for (EmoteStats stats : emoteStats) {
+            stats.setUser(this);
+        }
+        this.emoteStats = emoteStats;
+    }
+
+    public boolean addEmoteStats(EmoteStats emoteStats) {
+        emoteStats.setUser(this);
+        return this.emoteStats.add(emoteStats);
+    }
+
+    public boolean removeEmoteStats(EmoteStats emoteStats) {
+        return this.emoteStats.remove(emoteStats);
     }
 }
