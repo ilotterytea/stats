@@ -23,6 +23,7 @@ public class HibernateUtil {
                     .addAnnotatedClass(Command.class)
                     .addAnnotatedClass(Hashtag.class)
                     .addAnnotatedClass(Word.class)
+                    .addAnnotatedClass(Mention.class)
                     .buildSessionFactory();
         } catch (Throwable ex) {
             System.err.println("Initial SessionFactory creation failed: " + ex);

@@ -51,6 +51,9 @@ public class Channel {
     @OneToMany(mappedBy = "channel", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     private Set<Word> words;
 
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    private Set<Mention> mentions;
+
     public Channel(Integer aliasId, String aliasName) {
         this.aliasName = aliasName;
         this.aliasId = aliasId;
@@ -59,6 +62,7 @@ public class Channel {
         this.commands = new HashSet<>();
         this.hashtags = new HashSet<>();
         this.words = new HashSet<>();
+        this.mentions = new HashSet<>();
     }
 
     public Integer getId() {
@@ -176,5 +180,25 @@ public class Channel {
 
     public boolean removeWord(Word word) {
         return this.words.remove(word);
+    }
+
+    public Set<Mention> getMentions() {
+        return mentions;
+    }
+
+    public void setMentions(Set<Mention> mentions) {
+        for (Mention mention : mentions) {
+            mention.setChannel(this);
+        }
+        this.mentions = mentions;
+    }
+
+    public boolean addMention(Mention mention) {
+        mention.setChannel(this);
+        return this.mentions.add(mention);
+    }
+
+    public boolean removeMention(Mention mention) {
+        return this.mentions.remove(mention);
     }
 }
