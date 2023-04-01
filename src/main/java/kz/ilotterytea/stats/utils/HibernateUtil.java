@@ -2,6 +2,7 @@ package kz.ilotterytea.stats.utils;
 
 import kz.ilotterytea.stats.entities.*;
 import kz.ilotterytea.stats.entities.emotes.Emote;
+import kz.ilotterytea.stats.entities.stats.CommandStats;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
@@ -24,6 +25,7 @@ public class HibernateUtil {
                     .addAnnotatedClass(Hashtag.class)
                     .addAnnotatedClass(Word.class)
                     .addAnnotatedClass(Mention.class)
+                    .addAnnotatedClass(CommandStats.class)
                     .buildSessionFactory();
         } catch (Throwable ex) {
             System.err.println("Initial SessionFactory creation failed: " + ex);

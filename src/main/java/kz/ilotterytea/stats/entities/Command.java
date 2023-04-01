@@ -1,6 +1,7 @@
 package kz.ilotterytea.stats.entities;
 
 import jakarta.persistence.*;
+import kz.ilotterytea.stats.entities.stats.CommandStats;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -40,6 +41,9 @@ public class Command {
     @Column(name = "last_used_at", nullable = false)
     private Date lastUsageTimestamp;
 
+    @OneToOne(mappedBy = "command", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    private CommandStats stats;
+
     public Command(String name) {
         this.name = name;
         this.usedTimes = 0;
@@ -71,5 +75,14 @@ public class Command {
 
     public void setUsedTimes(Integer usedTimes) {
         this.usedTimes = usedTimes;
+    }
+
+    public CommandStats getStats() {
+        return stats;
+    }
+
+    public void setStats(CommandStats stats) {
+        stats.setCommand(this);
+        this.stats = stats;
     }
 }
