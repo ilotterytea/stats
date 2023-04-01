@@ -23,14 +23,14 @@ dependencies {
     //implementation("io.micronaut.sql:micronaut-jdbc-hikari")
     implementation("io.swagger.core.v3:swagger-annotations")
     implementation("jakarta.annotation:jakarta.annotation-api")
-    runtimeOnly("ch.qos.logback:logback-classic")
     //runtimeOnly("mysql:mysql-connector-java")
     //runtimeOnly("org.flywaydb:flyway-mysql")
     //compileOnly("org.graalvm.nativeimage:svm")
     implementation("com.google.code.gson:gson:2.10.1")
 
     implementation("io.micronaut:micronaut-validation")
-    implementation("com.github.twitch4j:twitch4j:1.13.0")
+    implementation('com.github.twitch4j:twitch4j:1.14.0')
+    implementation('ch.qos.logback:logback-classic:1.4.6')
     implementation("org.java-websocket:Java-WebSocket:1.5.3")
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
 
