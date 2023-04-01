@@ -28,7 +28,7 @@ public class CommandStats {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "command_id", nullable = false)
     private Command command;
 

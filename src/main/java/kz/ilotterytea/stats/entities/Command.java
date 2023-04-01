@@ -6,6 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author ilotterytea
@@ -41,12 +43,13 @@ public class Command {
     @Column(name = "last_used_at", nullable = false)
     private Date lastUsageTimestamp;
 
-    @OneToOne(mappedBy = "command", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
-    private CommandStats stats;
+    @OneToMany(mappedBy = "command", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    private Set<CommandStats> commandStats;
 
     public Command(String name) {
         this.name = name;
         this.usedTimes = 0;
+        this.commandStats = new HashSet<>();
     }
 
     public Integer getId() {
@@ -77,12 +80,23 @@ public class Command {
         this.usedTimes = usedTimes;
     }
 
-    public CommandStats getStats() {
-        return stats;
+    public Set<CommandStats> getCommandStats() {
+        return commandStats;
     }
 
-    public void setStats(CommandStats stats) {
-        stats.setCommand(this);
-        this.stats = stats;
+    public void setCommandStats(Set<CommandStats> commandStats) {
+        for (CommandStats stats : commandStats) {
+            stats.setCommand(this);
+        }
+        this.commandStats = commandStats;
+    }
+
+    public boolean addCommandStats(CommandStats commandStats) {
+        commandStats.setCommand(this);
+        return this.commandStats.add(commandStats);
+    }
+
+    public boolean removeCommandStats(CommandStats commandStats) {
+        return this.commandStats.remove(commandStats);
     }
 }
