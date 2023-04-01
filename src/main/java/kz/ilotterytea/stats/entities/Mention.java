@@ -1,10 +1,13 @@
 package kz.ilotterytea.stats.entities;
 
 import jakarta.persistence.*;
+import kz.ilotterytea.stats.entities.stats.MentionStats;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author ilotterytea
@@ -40,9 +43,13 @@ public class Mention {
     @Column(name = "last_used_at", nullable = false)
     private Date lastUsageTimestamp;
 
+    @OneToMany(mappedBy = "mention", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    private Set<MentionStats> mentionStats;
+
     public Mention(String name) {
         this.name = name;
         this.usedTimes = 0;
+        this.mentionStats = new HashSet<>();
     }
 
     public Integer getId() {
@@ -71,5 +78,25 @@ public class Mention {
 
     public void setUsedTimes(Integer usedTimes) {
         this.usedTimes = usedTimes;
+    }
+
+    public Set<MentionStats> getMentionStats() {
+        return mentionStats;
+    }
+
+    public void setMentionStats(Set<MentionStats> mentionStats) {
+        for (MentionStats stats : mentionStats) {
+            stats.setMention(this);
+        }
+        this.mentionStats = mentionStats;
+    }
+
+    public boolean addMentionStats(MentionStats mentionStats) {
+        mentionStats.setMention(this);
+        return this.mentionStats.add(mentionStats);
+    }
+
+    public boolean removeMentionStats(MentionStats mentionStats) {
+        return this.mentionStats.remove(mentionStats);
     }
 }

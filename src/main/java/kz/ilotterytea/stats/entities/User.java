@@ -3,6 +3,7 @@ package kz.ilotterytea.stats.entities;
 import jakarta.persistence.*;
 import kz.ilotterytea.stats.entities.stats.CommandStats;
 import kz.ilotterytea.stats.entities.stats.HashtagStats;
+import kz.ilotterytea.stats.entities.stats.MentionStats;
 import kz.ilotterytea.stats.entities.stats.WordStats;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -41,12 +42,16 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     private Set<WordStats> wordStats;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    private Set<MentionStats> mentionStats;
+
     public User(Integer aliasId, String aliasName) {
         this.aliasId = aliasId;
         this.aliasName = aliasName;
         this.commandStats = new HashSet<>();
         this.hashtagStats = new HashSet<>();
         this.wordStats = new HashSet<>();
+        this.mentionStats = new HashSet<>();
     }
 
     public Integer getId() {
@@ -127,5 +132,25 @@ public class User {
 
     public boolean removeWordStats(WordStats wordStats) {
         return this.wordStats.remove(wordStats);
+    }
+
+    public Set<MentionStats> getMentionStats() {
+        return mentionStats;
+    }
+
+    public void setMentionStats(Set<MentionStats> mentionStats) {
+        for (MentionStats stats : mentionStats) {
+            stats.setUser(this);
+        }
+        this.mentionStats = mentionStats;
+    }
+
+    public boolean addMentionStats(MentionStats mentionStats) {
+        mentionStats.setUser(this);
+        return this.mentionStats.add(mentionStats);
+    }
+
+    public boolean removeMentionStats(MentionStats mentionStats) {
+        return this.mentionStats.remove(mentionStats);
     }
 }
