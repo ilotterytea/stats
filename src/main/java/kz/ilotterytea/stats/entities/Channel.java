@@ -42,11 +42,15 @@ public class Channel {
     @OneToMany(mappedBy = "channel", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     private Set<Emote> emotes;
 
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    private Set<Command> commands;
+
     public Channel(Integer aliasId, String aliasName) {
         this.aliasName = aliasName;
         this.aliasId = aliasId;
         this.isParted = false;
         this.emotes = new HashSet<>();
+        this.commands = new HashSet<>();
     }
 
     public Integer getId() {
@@ -104,5 +108,25 @@ public class Channel {
 
     public boolean removeEmote(Emote emote) {
         return this.emotes.remove(emote);
+    }
+
+    public Set<Command> getCommands() {
+        return commands;
+    }
+
+    public void setCommands(Set<Command> commands) {
+        for (Command command : commands) {
+            command.setChannel(this);
+        }
+        this.commands = commands;
+    }
+
+    public boolean addCommand(Command command) {
+        command.setChannel(this);
+        return this.commands.add(command);
+    }
+
+    public boolean removeCommand(Command command){
+        return this.commands.remove(command);
     }
 }
