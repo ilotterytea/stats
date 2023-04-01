@@ -1,6 +1,7 @@
 package kz.ilotterytea.stats.utils;
 
 import kz.ilotterytea.stats.entities.Channel;
+import kz.ilotterytea.stats.entities.emotes.Emote;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
@@ -17,6 +18,7 @@ public class HibernateUtil {
             return configuration
                     .configure()
                     .addAnnotatedClass(Channel.class)
+                    .addAnnotatedClass(Emote.class)
                     .buildSessionFactory();
         } catch (Throwable ex) {
             System.err.println("Initial SessionFactory creation failed: " + ex);

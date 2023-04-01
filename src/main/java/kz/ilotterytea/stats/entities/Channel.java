@@ -1,10 +1,13 @@
 package kz.ilotterytea.stats.entities;
 
 import jakarta.persistence.*;
+import kz.ilotterytea.stats.entities.emotes.Emote;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author ilotterytea
@@ -36,10 +39,14 @@ public class Channel {
     @Column(name = "last_active_at", nullable = false)
     private Date lastActiveTimestamp;
 
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    private Set<Emote> emotes;
+
     public Channel(Integer aliasId, String aliasName) {
         this.aliasName = aliasName;
         this.aliasId = aliasId;
         this.isParted = false;
+        this.emotes = new HashSet<>();
     }
 
     public Integer getId() {
@@ -76,5 +83,26 @@ public class Channel {
 
     public void setParted(Boolean parted) {
         isParted = parted;
+    }
+
+    public Set<Emote> getEmotes() {
+        return emotes;
+    }
+
+    public void setEmotes(Set<Emote> emotes) {
+        for (Emote emote : emotes) {
+            emote.setChannel(this);
+        }
+
+        this.emotes = emotes;
+    }
+
+    public boolean addEmote(Emote emote) {
+        emote.setChannel(this);
+        return this.emotes.add(emote);
+    }
+
+    public boolean removeEmote(Emote emote) {
+        return this.emotes.remove(emote);
     }
 }
