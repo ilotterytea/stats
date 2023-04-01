@@ -2,6 +2,7 @@ package kz.ilotterytea.stats.entities;
 
 import jakarta.persistence.*;
 import kz.ilotterytea.stats.entities.stats.CommandStats;
+import kz.ilotterytea.stats.entities.stats.HashtagStats;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
@@ -33,10 +34,14 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     private Set<CommandStats> commandStats;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    private Set<HashtagStats> hashtagStats;
+
     public User(Integer aliasId, String aliasName) {
         this.aliasId = aliasId;
         this.aliasName = aliasName;
         this.commandStats = new HashSet<>();
+        this.hashtagStats = new HashSet<>();
     }
 
     public Integer getId() {
@@ -77,5 +82,25 @@ public class User {
 
     public boolean removeCommandStats(CommandStats commandStats) {
         return this.commandStats.remove(commandStats);
+    }
+
+    public Set<HashtagStats> getHashtagStats() {
+        return hashtagStats;
+    }
+
+    public void setHashtagStats(Set<HashtagStats> hashtagStats) {
+        for (HashtagStats stats : hashtagStats) {
+            stats.setUser(this);
+        }
+        this.hashtagStats = hashtagStats;
+    }
+
+    public boolean addHashtagStats(HashtagStats hashtagStats) {
+        hashtagStats.setUser(this);
+        return this.hashtagStats.add(hashtagStats);
+    }
+
+    public boolean removeHashtagStats(HashtagStats hashtagStats) {
+        return this.hashtagStats.remove(hashtagStats);
     }
 }

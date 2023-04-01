@@ -1,10 +1,13 @@
 package kz.ilotterytea.stats.entities;
 
 import jakarta.persistence.*;
+import kz.ilotterytea.stats.entities.stats.HashtagStats;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author ilotterytea
@@ -40,9 +43,13 @@ public class Hashtag {
     @Column(name = "last_used_at", nullable = false)
     private Date lastUsageTimestamp;
 
+    @OneToMany(mappedBy = "hashtag", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    private Set<HashtagStats> hashtagStats;
+
     public Hashtag(String name) {
         this.name = name;
         this.usedTimes = 0;
+        this.hashtagStats = new HashSet<>();
     }
 
     public Integer getId() {
@@ -71,5 +78,25 @@ public class Hashtag {
 
     public void setUsedTimes(Integer usedTimes) {
         this.usedTimes = usedTimes;
+    }
+
+    public Set<HashtagStats> getHashtagStats() {
+        return hashtagStats;
+    }
+
+    public void setHashtagStats(Set<HashtagStats> hashtagStats) {
+        for (HashtagStats stats : hashtagStats) {
+            stats.setHashtag(this);
+        }
+        this.hashtagStats = hashtagStats;
+    }
+
+    public boolean addHashtagStats(HashtagStats hashtagStats) {
+        hashtagStats.setHashtag(this);
+        return this.hashtagStats.add(hashtagStats);
+    }
+
+    public boolean removeHashtagStats(HashtagStats hashtagStats) {
+        return this.hashtagStats.remove(hashtagStats);
     }
 }
