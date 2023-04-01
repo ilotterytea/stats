@@ -3,6 +3,7 @@ package kz.ilotterytea.stats.entities;
 import jakarta.persistence.*;
 import kz.ilotterytea.stats.entities.stats.CommandStats;
 import kz.ilotterytea.stats.entities.stats.HashtagStats;
+import kz.ilotterytea.stats.entities.stats.WordStats;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
@@ -37,11 +38,15 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     private Set<HashtagStats> hashtagStats;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    private Set<WordStats> wordStats;
+
     public User(Integer aliasId, String aliasName) {
         this.aliasId = aliasId;
         this.aliasName = aliasName;
         this.commandStats = new HashSet<>();
         this.hashtagStats = new HashSet<>();
+        this.wordStats = new HashSet<>();
     }
 
     public Integer getId() {
@@ -102,5 +107,25 @@ public class User {
 
     public boolean removeHashtagStats(HashtagStats hashtagStats) {
         return this.hashtagStats.remove(hashtagStats);
+    }
+
+    public Set<WordStats> getWordStats() {
+        return wordStats;
+    }
+
+    public void setWordStats(Set<WordStats> wordStats) {
+        for (WordStats stats : wordStats) {
+            stats.setUser(this);
+        }
+        this.wordStats = wordStats;
+    }
+
+    public boolean addWordStats(WordStats wordStats) {
+        wordStats.setUser(this);
+        return this.wordStats.add(wordStats);
+    }
+
+    public boolean removeWordStats(WordStats wordStats) {
+        return this.wordStats.remove(wordStats);
     }
 }

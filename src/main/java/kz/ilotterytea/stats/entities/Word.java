@@ -1,10 +1,13 @@
 package kz.ilotterytea.stats.entities;
 
 import jakarta.persistence.*;
+import kz.ilotterytea.stats.entities.stats.WordStats;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author ilotterytea
@@ -40,9 +43,13 @@ public class Word {
     @Column(name = "last_used_at", nullable = false)
     private Date lastUsageTimestamp;
 
+    @OneToMany(mappedBy = "word", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    private Set<WordStats> wordStats;
+
     public Word(String name) {
         this.name = name;
         this.usedTimes = 0;
+        this.wordStats = new HashSet<>();
     }
 
     public Integer getId() {
@@ -71,5 +78,25 @@ public class Word {
 
     public void setUsedTimes(Integer usedTimes) {
         this.usedTimes = usedTimes;
+    }
+
+    public Set<WordStats> getWordStats() {
+        return wordStats;
+    }
+
+    public void setWordStats(Set<WordStats> wordStats) {
+        for (WordStats stats : wordStats) {
+            stats.setWord(this);
+        }
+        this.wordStats = wordStats;
+    }
+
+    public boolean addWordStats(WordStats wordStats) {
+        wordStats.setWord(this);
+        return this.wordStats.add(wordStats);
+    }
+
+    public boolean removeWordStats(WordStats wordStats) {
+        return this.wordStats.remove(wordStats);
     }
 }
