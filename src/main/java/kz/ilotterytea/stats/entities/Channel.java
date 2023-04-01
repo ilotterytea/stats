@@ -48,6 +48,9 @@ public class Channel {
     @OneToMany(mappedBy = "channel", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     private Set<Hashtag> hashtags;
 
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    private Set<Word> words;
+
     public Channel(Integer aliasId, String aliasName) {
         this.aliasName = aliasName;
         this.aliasId = aliasId;
@@ -55,6 +58,7 @@ public class Channel {
         this.emotes = new HashSet<>();
         this.commands = new HashSet<>();
         this.hashtags = new HashSet<>();
+        this.words = new HashSet<>();
     }
 
     public Integer getId() {
@@ -152,5 +156,25 @@ public class Channel {
 
     public boolean removeHashtag(Hashtag hashtag) {
         return this.hashtags.remove(hashtag);
+    }
+
+    public Set<Word> getWords() {
+        return words;
+    }
+
+    public void setWords(Set<Word> words) {
+        for (Word word : words) {
+            word.setChannel(this);
+        }
+        this.words = words;
+    }
+
+    public boolean addWord(Word word) {
+        word.setChannel(this);
+        return this.words.add(word);
+    }
+
+    public boolean removeWord(Word word) {
+        return this.words.remove(word);
     }
 }
