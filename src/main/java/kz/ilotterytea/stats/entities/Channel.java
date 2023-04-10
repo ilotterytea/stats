@@ -1,10 +1,13 @@
 package kz.ilotterytea.stats.entities;
 
 import jakarta.persistence.*;
+import kz.ilotterytea.stats.entities.emotes.Emote;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author ilotterytea
@@ -36,9 +39,13 @@ public class Channel {
     @Column(name = "opt_outed_at")
     private Date optOutTimestamp;
 
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    private Set<Emote> emotes;
+
     public Channel(Integer aliasId, String aliasName) {
         this.aliasId = aliasId;
         this.aliasName = aliasName;
+        this.emotes = new HashSet<>();
     }
 
     public Channel() {}
@@ -69,5 +76,25 @@ public class Channel {
 
     public Date getOptOutTimestamp() {
         return optOutTimestamp;
+    }
+
+    public Set<Emote> getEmotes() {
+        return emotes;
+    }
+
+    public void setEmotes(Set<Emote> emotes) {
+        for (Emote emote : emotes) {
+            emote.setChannel(this);
+        }
+        this.emotes = emotes;
+    }
+
+    public void addEmote(Emote emote) {
+        emote.setChannel(this);
+        this.emotes.add(emote);
+    }
+
+    public void removeEmote(Emote emote) {
+        this.emotes.remove(emote);
     }
 }

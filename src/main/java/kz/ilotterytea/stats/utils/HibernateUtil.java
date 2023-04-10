@@ -1,6 +1,7 @@
 package kz.ilotterytea.stats.utils;
 
 import kz.ilotterytea.stats.entities.*;
+import kz.ilotterytea.stats.entities.emotes.Emote;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ public class HibernateUtil {
             return new Configuration()
                     .configure()
                     .addAnnotatedClass(Channel.class)
+                    .addAnnotatedClass(Emote.class)
                     .buildSessionFactory();
         } catch (Throwable ex) {
             log.error("Couldn't create a session: ", ex);
