@@ -20,7 +20,7 @@ dependencies {
     implementation("io.micronaut.views:micronaut-views-handlebars")
     implementation("io.swagger.core.v3:swagger-annotations")
     implementation("jakarta.annotation:jakarta.annotation-api")
-    implementation("ch.qos.logback:logback-classic")
+    implementation("ch.qos.logback:logback-classic:1.4.6")
     implementation("io.micronaut:micronaut-validation")
     implementation('org.hibernate:hibernate-core:6.2.0.Final')
     implementation('org.postgresql:postgresql:42.6.0')
@@ -36,6 +36,12 @@ application {
 java {
     sourceCompatibility = JavaVersion.toVersion("11")
     targetCompatibility = JavaVersion.toVersion("11")
+}
+
+run {
+    systemProperties['twitch_access_token'] = System.getProperty("stats.twitch_access_token")
+    systemProperties['twitch_client_id'] = System.getProperty("stats.twitch_client_id")
+    systemProperties['twitch_oauth2_token'] = System.getProperty("stats.twitch_oauth2_token")
 }
 
 graalvmNative.toolchainDetection = false
