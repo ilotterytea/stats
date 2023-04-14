@@ -7,4 +7,5 @@ public class SharedConstants {
 
     public static final String STV_API_BASE = "https://7tv.io/v3";
     public static final String STV_API_USER_ENDPOINT = STV_API_BASE + "/users/twitch/%s";
+    public static final String STV_API_EMOTESET_ENDPOINT = STV_API_BASE + "/emote-sets/%s";
 }

@@ -2,6 +2,7 @@ package kz.ilotterytea.stats.thirdparty.seventv;
 
 import com.google.gson.Gson;
 import kz.ilotterytea.stats.SharedConstants;
+import kz.ilotterytea.stats.thirdparty.seventv.schemas.api.EmoteSet;
 import kz.ilotterytea.stats.thirdparty.seventv.schemas.api.User;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -33,6 +34,27 @@ public class SevenTVAPIWrapper {
             return new Gson().fromJson(response.body().string(), User.class);
         } catch (IOException e) {
             logger.error("Couldn't get a user: ", e);
+            return null;
+        }
+    }
+
+    public static EmoteSet getEmoteSet(String seventvID) {
+        Logger logger = LoggerFactory.getLogger(SevenTVAPIWrapper.class.getSimpleName());
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        Request request = new Request.Builder()
+                .get()
+                .url(String.format(SharedConstants.STV_API_EMOTESET_ENDPOINT, seventvID))
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (response.code() != 200 || response.body() == null) {
+                logger.warn("Couldn't get an emote set: " + ((response.code() != 200) ? "received " + response.code() + " status code!" : "response body is null!"));
+                return null;
+            }
+
+            return new Gson().fromJson(response.body().string(), EmoteSet.class);
+        } catch (IOException e) {
+            logger.error("Couldn't get an emote set: ", e);
             return null;
         }
     }

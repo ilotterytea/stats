@@ -10,6 +10,7 @@ public class EmoteSet {
     private String id;
     private String name;
     private ArrayList<Emote> emotes;
+    private SevenTVUser owner;
 
     public EmoteSet() {}
 
@@ -35,5 +36,13 @@ public class EmoteSet {
 
     public void setEmotes(ArrayList<Emote> emotes) {
         this.emotes = emotes;
+    }
+
+    public SevenTVUser getOwner() {
+        return owner;
+    }
+
+    public void setOwner(SevenTVUser owner) {
+        this.owner = owner;
     }
 }
