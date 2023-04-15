@@ -33,8 +33,16 @@ public class SevenTVWebsocketClient extends WebSocketClient {
     private String sessionId;
     private boolean tryingToResume = false;
 
+    private static SevenTVWebsocketClient instance;
+
+    public static SevenTVWebsocketClient getInstance() {
+        return instance;
+    }
+
     public SevenTVWebsocketClient() throws URISyntaxException {
         super(new URI(SharedConstants.STV_WEBSOCKET_BASE));
+
+        instance = this;
     }
 
     @Override
