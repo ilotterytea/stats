@@ -2,20 +2,22 @@ package kz.ilotterytea.stats.thirdparty.seventv.schemas.api;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 /**
  * @author ilotterytea
  * @since 1.0
  */
-public class SevenTVUser {
+public class UserConnection {
     private String id;
+    private String platform;
     private String username;
     @SerializedName("display_name")
     private String displayName;
-    private List<UserConnection> connections;
+    @SerializedName("emote_set_id")
+    private String emoteSetId;
+    @SerializedName("emote_set")
+    private EmoteSet emoteSet;
 
-    public SevenTVUser() {}
+    public UserConnection() {}
 
     public String getId() {
         return id;
@@ -23,6 +25,14 @@ public class SevenTVUser {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(String platform) {
+        this.platform = platform;
     }
 
     public String getUsername() {
@@ -41,11 +51,19 @@ public class SevenTVUser {
         this.displayName = displayName;
     }
 
-    public List<UserConnection> getConnections() {
-        return connections;
+    public String getEmoteSetId() {
+        return emoteSetId;
     }
 
-    public void setConnections(List<UserConnection> connections) {
-        this.connections = connections;
+    public void setEmoteSetId(String emoteSetId) {
+        this.emoteSetId = emoteSetId;
+    }
+
+    public EmoteSet getEmoteSet() {
+        return emoteSet;
+    }
+
+    public void setEmoteSet(EmoteSet emoteSet) {
+        this.emoteSet = emoteSet;
     }
 }
