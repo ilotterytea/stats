@@ -282,6 +282,27 @@ public class SevenTVWebsocketClient extends WebSocketClient {
         return true;
     }
 
+    public boolean joinChannel(Integer aliasId) {
+        User stvUser = SevenTVAPIWrapper.getUser(aliasId);
+
+        if (stvUser != null) {
+            String json = new Gson().toJson(
+                    new Payload<>(
+                            35,
+                            new PayloadData<>(
+                                    "emote_set.update",
+                                    new ConditionData(stvUser.getEmoteSet().getId())
+                            )
+                    )
+            );
+
+            super.send(json);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private void handleHelloEvent(String message, Session session) {
         Gson gson = new Gson();
 
@@ -295,20 +316,8 @@ public class SevenTVWebsocketClient extends WebSocketClient {
         List<Channel> channels = session.createQuery("from Channel where optOutTimestamp is null", Channel.class).getResultList();
 
         for (Channel channel : channels) {
-            User stvUser = SevenTVAPIWrapper.getUser(channel.getAliasId());
-
-            if (stvUser != null) {
-                String json = new Gson().toJson(
-                        new Payload<>(
-                                35,
-                                new PayloadData<>(
-                                        "emote_set.update",
-                                        new ConditionData(stvUser.getEmoteSet().getId())
-                                )
-                        )
-                );
-
-                super.send(json);
+            if (!joinChannel(channel.getAliasId())) {
+                LOGGER.debug("Couldn't find the 7TV userdata for alias ID " + channel.getAliasId());
             }
         }
     }
