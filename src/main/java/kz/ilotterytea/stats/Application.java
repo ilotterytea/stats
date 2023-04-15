@@ -3,10 +3,10 @@ package kz.ilotterytea.stats;
 import io.micronaut.runtime.Micronaut;
 import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.info.*;
-import kz.ilotterytea.stats.entities.Channel;
+import kz.ilotterytea.stats.thirdparty.seventv.SevenTVWebsocketClient;
 import kz.ilotterytea.stats.twitchbot.TwitchBot;
-import kz.ilotterytea.stats.utils.HibernateUtil;
-import org.hibernate.Session;
+
+import java.net.URISyntaxException;
 
 @OpenAPIDefinition(
     info = @Info(
@@ -17,6 +17,13 @@ import org.hibernate.Session;
 public class Application {
 
     public static void main(String[] args) {
+        try {
+            SevenTVWebsocketClient client = new SevenTVWebsocketClient();
+            client.connectBlocking();
+        } catch (InterruptedException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
         Micronaut.run(Application.class, args);
 
         TwitchBot bot = new TwitchBot();
