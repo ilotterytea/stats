@@ -78,6 +78,10 @@ public class Channel {
         return optOutTimestamp;
     }
 
+    public void setOptOutTimestamp(Date optOutTimestamp) {
+        this.optOutTimestamp = optOutTimestamp;
+    }
+
     public Set<Emote> getEmotes() {
         return emotes;
     }
