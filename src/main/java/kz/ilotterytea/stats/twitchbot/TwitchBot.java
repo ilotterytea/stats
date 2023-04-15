@@ -22,6 +22,10 @@ public class TwitchBot {
     private static TwitchBot instance;
     private TwitchClient client;
 
+    public TwitchClient getClient() {
+        return client;
+    }
+
     public static TwitchBot getInstance() {
         return instance;
     }
