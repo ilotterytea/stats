@@ -47,7 +47,7 @@ public class Channel {
     private Date optOutTimestamp;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "channel", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private Set<Emote> emotes;
 
     public Channel(Integer aliasId, String aliasName) {
