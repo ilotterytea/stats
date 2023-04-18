@@ -3,6 +3,7 @@ package kz.ilotterytea.stats.controllers;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Part;
 import io.micronaut.http.annotation.Post;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,10 +23,8 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.lang.management.ManagementFactory;
+import java.util.*;
 
 /**
  * @author ilotterytea
@@ -203,5 +202,29 @@ public class MiscController {
         return HttpResponse
                 .ok()
                 .body(new Payload<>(success));
+    }
+
+    @Operation(
+            summary = "Get the health status of the instance",
+            tags = "Miscellaneous"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Returns a HashMap<String, Object> with health info."
+    )
+    @Get(
+            value = "/health",
+            produces = MediaType.APPLICATION_JSON
+    )
+    public HttpResponse<Payload<HashMap<String, Object>>> getHealth() {
+        HashMap<String, Object> map = new HashMap<>();
+
+        map.put("uptime_ms", ManagementFactory.getRuntimeMXBean().getUptime());
+
+        Runtime rt = Runtime.getRuntime();
+        map.put("used_memory_mb", ((rt.totalMemory() - rt.freeMemory()) / 1024.0) / 1024.0);
+        map.put("total_memory_mb", ((rt.totalMemory() / 1024.0) / 1024.0));
+
+        return HttpResponse.ok(new Payload<>(map));
     }
 }
