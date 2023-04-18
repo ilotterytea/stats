@@ -35,7 +35,8 @@ import java.util.List;
 public class MiscController {
     @Operation(
             summary = "Listen the channels",
-            description = "Creating a channel, synchronizing its 7TV emotes, subscribing it to 7TV EventAPI."
+            description = "Creating a channel, synchronizing its 7TV emotes, subscribing it to 7TV EventAPI.",
+            tags = "Miscellaneous"
     )
     @ApiResponse(
             responseCode = "200",
@@ -149,7 +150,8 @@ public class MiscController {
 
     @Operation(
             summary = "Opt-out the channels",
-            description = "Opt-out the channels. Parting from Twitch chats, which means the emote count will be paused."
+            description = "Opt-out the channels. Parting from Twitch chats, which means the emote count will be paused.",
+            tags = "Miscellaneous"
     )
     @ApiResponse(
             responseCode = "200",
