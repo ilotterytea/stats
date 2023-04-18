@@ -14,6 +14,7 @@ import kz.ilotterytea.stats.schemas.Payload;
 import kz.ilotterytea.stats.thirdparty.seventv.SevenTVAPIWrapper;
 import kz.ilotterytea.stats.thirdparty.seventv.SevenTVWebsocketClient;
 import kz.ilotterytea.stats.thirdparty.seventv.schemas.api.Emote;
+import kz.ilotterytea.stats.thirdparty.seventv.schemas.api.EmoteSet;
 import kz.ilotterytea.stats.thirdparty.seventv.schemas.api.User;
 import kz.ilotterytea.stats.twitchbot.TwitchBot;
 import kz.ilotterytea.stats.utils.HibernateUtil;
@@ -93,14 +94,16 @@ public class MiscController {
             com.github.twitch4j.helix.domain.User twitchUser = twitchUsers.get(0);
 
             // Get data from 7TV:
+            EmoteSet emoteSet = SevenTVAPIWrapper.getEmoteSet("global");
             User user = SevenTVAPIWrapper.getUser(intId);
             Channel channel = new Channel(intId, twitchUser.getLogin());
 
             session.getTransaction().begin();
 
+            session.persist(channel);
+
             if (user != null) {
                 logger.debug("Retrieved the data from 7TV for user ID " + id + "!");
-                session.persist(channel);
 
                 for (Emote emote : user.getEmoteSet().getEmotes()) {
                     kz.ilotterytea.stats.entities.emotes.Emote emote1 = new kz.ilotterytea.stats.entities.emotes.Emote(
@@ -115,6 +118,20 @@ public class MiscController {
                 }
 
                 logger.debug("Assigned " + user.getEmoteSet().getEmotes().size() + " emotes to channel ID " + channel.getId() + "!");
+            }
+
+            if (emoteSet != null) {
+                for (Emote emote : emoteSet.getEmotes()) {
+                    kz.ilotterytea.stats.entities.emotes.Emote emote1 = new kz.ilotterytea.stats.entities.emotes.Emote(
+                            channel,
+                            EmoteProvider.SEVENTV,
+                            emote.getId(),
+                            emote.getName()
+                    );
+
+                    channel.addEmote(emote1);
+                    session.persist(emote1);
+                }
             }
 
             logger.debug("Saved channel ID " + channel.getId() + "!");

@@ -8,6 +8,7 @@ import kz.ilotterytea.stats.entities.emotes.EmoteProvider;
 import kz.ilotterytea.stats.thirdparty.seventv.SevenTVAPIWrapper;
 import kz.ilotterytea.stats.thirdparty.seventv.SevenTVWebsocketClient;
 import kz.ilotterytea.stats.thirdparty.seventv.schemas.api.Emote;
+import kz.ilotterytea.stats.thirdparty.seventv.schemas.api.EmoteSet;
 import kz.ilotterytea.stats.thirdparty.seventv.schemas.api.User;
 import kz.ilotterytea.stats.twitchbot.TwitchBot;
 import kz.ilotterytea.stats.utils.HibernateUtil;
@@ -31,6 +32,7 @@ public class Application {
         // Sync emotes:
         Session session = HibernateUtil.getSessionFactory().openSession();
         List<Channel> channels = session.createQuery("from Channel where optOutTimestamp is null", Channel.class).getResultList();
+        EmoteSet globalEmoteSet = SevenTVAPIWrapper.getEmoteSet("global");
 
         for (Channel channel : channels) {
             User user = SevenTVAPIWrapper.getUser(channel.getAliasId());
@@ -40,6 +42,61 @@ public class Application {
             }
 
             session.getTransaction().begin();
+
+            // Sync new global emotes:
+            if (globalEmoteSet != null) {
+                for (Emote emote : globalEmoteSet.getEmotes()) {
+                    Optional<kz.ilotterytea.stats.entities.emotes.Emote> optionalEmote = channel
+                            .getEmotes()
+                            .stream().filter(
+                                    p -> p.getProviderType().equals(EmoteProvider.SEVENTV) &&
+                                            p.getProviderId().equals(emote.getId())
+                            )
+                            .findFirst();
+
+                    if (optionalEmote.isEmpty()) {
+                        kz.ilotterytea.stats.entities.emotes.Emote newEmote = new kz.ilotterytea.stats.entities.emotes.Emote(
+                                channel,
+                                EmoteProvider.SEVENTV,
+                                emote.getId(),
+                                emote.getName()
+                        );
+
+                        newEmote.setGlobal(true);
+
+                        channel.addEmote(newEmote);
+                        session.persist(channel);
+                        session.persist(newEmote);
+                    } else {
+                        kz.ilotterytea.stats.entities.emotes.Emote unwrapedEmote = optionalEmote.get();
+
+                        unwrapedEmote.setName(emote.getName());
+                        unwrapedEmote.setDeletionTimestamp(null);
+                        unwrapedEmote.setDeleted(false);
+                        session.persist(unwrapedEmote);
+                    }
+                }
+
+                for (kz.ilotterytea.stats.entities.emotes.Emote emote : channel
+                        .getEmotes()
+                        .stream()
+                        .filter(p -> p.getProviderType().equals(EmoteProvider.SEVENTV) && p.getDeletionTimestamp() == null)
+                        .collect(Collectors.toSet())
+                ) {
+                    Optional<Emote> optionalEmote = globalEmoteSet
+                            .getEmotes()
+                            .stream().filter(
+                                    p -> p.getId().equals(emote.getProviderId())
+                            )
+                            .findFirst();
+
+                    if (optionalEmote.isEmpty()) {
+                        emote.setDeleted(true);
+                        emote.setDeletionTimestamp(new Date());
+                        session.persist(emote);
+                    }
+                }
+            }
 
             // Sync new emotes:
             for (Emote emote : user.getEmoteSet().getEmotes()) {
