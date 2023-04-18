@@ -1,5 +1,7 @@
 package kz.ilotterytea.stats.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import kz.ilotterytea.stats.entities.emotes.Emote;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,25 +22,31 @@ public class Channel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @JsonProperty("alias_id")
     @Column(name = "alias_id", nullable = false, unique = true, updatable = false)
     private Integer aliasId;
 
+    @JsonProperty("alias_name")
     @Column(name = "alias_name", nullable = false)
     private String aliasName;
 
+    @JsonProperty("created_at")
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false, updatable = false)
     private Date creationTimestamp;
 
+    @JsonProperty("updated_at")
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "refreshed_at")
     private Date refreshedTimestamp;
 
+    @JsonProperty("opt_outed_at")
     @Column(name = "opt_outed_at")
     private Date optOutTimestamp;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "channel", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     private Set<Emote> emotes;
 

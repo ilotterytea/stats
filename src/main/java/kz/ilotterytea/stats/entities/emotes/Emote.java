@@ -1,5 +1,7 @@
 package kz.ilotterytea.stats.entities.emotes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import kz.ilotterytea.stats.entities.Channel;
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,16 +20,20 @@ public class Emote {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @JsonProperty("channel_id")
     @Column(name = "channel_id", insertable = false, updatable = false, nullable = false)
     private Integer channelId;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "channel_id", nullable = false)
     private Channel channel;
 
+    @JsonProperty("provider_id")
     @Column(name = "provider_id", updatable = false, nullable = false)
     private String providerId;
 
+    @JsonProperty("provider_type")
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "provider_type", updatable = false, nullable = false)
     private EmoteProvider providerType;
@@ -35,25 +41,31 @@ public class Emote {
     @Column(nullable = false)
     private String name;
 
+    @JsonProperty("used_times")
     @Column(name = "used_times", nullable = false)
     private Integer usedTimes;
 
+    @JsonProperty("is_global")
     @Column(name = "is_global", nullable = false)
     private Boolean isGlobal;
 
+    @JsonProperty("is_deleted")
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
 
+    @JsonProperty("created_at")
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false, nullable = false)
     private Date creationTimestamp;
 
+    @JsonProperty("updated_at")
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "refreshed_at")
     private Date refreshedTimestamp;
 
+    @JsonProperty("deleted_at")
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "deleted_at")
     private Date deletionTimestamp;
