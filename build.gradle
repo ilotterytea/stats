@@ -39,9 +39,7 @@ java {
 }
 
 run {
-    systemProperties['twitch_access_token'] = System.getProperty("stats.twitch_access_token")
-    systemProperties['twitch_client_id'] = System.getProperty("stats.twitch_client_id")
-    systemProperties['twitch_oauth2_token'] = System.getProperty("stats.twitch_oauth2_token")
+    systemProperties['stats.twitch_oauth2_token'] = System.getProperty("stats.twitch_oauth2_token")
 }
 
 graalvmNative.toolchainDetection = false

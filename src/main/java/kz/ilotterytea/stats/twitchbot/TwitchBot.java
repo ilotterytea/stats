@@ -43,7 +43,6 @@ public class TwitchBot {
         credential = new OAuth2Credential("twitch", SharedConstants.BOT_OAUTH2_TOKEN);
 
         client = TwitchClientBuilder.builder()
-                .withClientId(SharedConstants.BOT_CLIENT_ID)
                 .withEnableHelix(true)
                 .withChatAccount(credential)
                 .withEnableChat(true)
