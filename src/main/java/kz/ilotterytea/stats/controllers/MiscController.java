@@ -78,7 +78,7 @@ public class MiscController {
                     .getClient()
                     .getHelix()
                     .getUsers(
-                            null,
+                            TwitchBot.getInstance().getCredential().getAccessToken(),
                             Collections.singletonList(id),
                             null
                     )

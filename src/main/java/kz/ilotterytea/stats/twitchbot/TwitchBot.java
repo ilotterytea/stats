@@ -21,9 +21,14 @@ import java.util.stream.Collectors;
 public class TwitchBot {
     private static TwitchBot instance;
     private TwitchClient client;
+    private OAuth2Credential credential;
 
     public TwitchClient getClient() {
         return client;
+    }
+
+    public OAuth2Credential getCredential() {
+        return credential;
     }
 
     public static TwitchBot getInstance() {
@@ -35,7 +40,7 @@ public class TwitchBot {
     }
 
     public void run() {
-        OAuth2Credential credential = new OAuth2Credential("twitch", SharedConstants.BOT_OAUTH2_TOKEN);
+        credential = new OAuth2Credential("twitch", SharedConstants.BOT_OAUTH2_TOKEN);
 
         client = TwitchClientBuilder.builder()
                 .withClientId(SharedConstants.BOT_CLIENT_ID)
@@ -55,7 +60,7 @@ public class TwitchBot {
             // Getting info from Twitch about these channels.
             // This is needed in case a channel has changed its username while the application was turned off.
             UserList parsedChannels = client.getHelix()
-                    .getUsers(SharedConstants.BOT_ACCESS_TOKEN, channels.stream().map(p -> p.getAliasId().toString()).collect(Collectors.toList()), null)
+                    .getUsers(credential.getAccessToken(), channels.stream().map(p -> p.getAliasId().toString()).collect(Collectors.toList()), null)
                     .execute();
 
             if (!parsedChannels.getUsers().isEmpty()) {
