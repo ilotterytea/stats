@@ -9,15 +9,6 @@ micronaut:
       swagger-ui:
         paths: classpath:META-INF/swagger/views/swagger-ui
         mapping: /swagger-ui/**
-datasources:
-  default:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    db-type: mysql
-    dialect: MYSQL
-flyway:
-  datasources:
-    default:
-      enabled: true
 netty:
   default:
     allocator:

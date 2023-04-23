@@ -1,17 +1,11 @@
 package kz.ilotterytea.stats;
 
-import java.io.File;
-
-/**
- * @author ilotterytea
- * @since 1.0
- */
 public class SharedConstants {
-    public static final String PROPERTIES_PATH = "./config.properties";
-    public static final String TARGETS_PATH = "./targets";
-    public static final File TARGETS_FILE = new File(TARGETS_PATH);
+    public static final String BOT_OAUTH2_TOKEN = System.getProperty("stats.twitch_oauth2_token");
 
-    public static final String STV_EVENTAPI_WSS = "wss://events.7tv.app/v1/channel-emotes";
-    public static final String STV_CHANNEL_EMOTES_URL = "https://api.7tv.app/v2/users/%s/emotes";
-    public static final String STV_GLOBAL_EMOTES_URL = "https://api.7tv.app/v2/emotes/global";
+    public static final String STV_WEBSOCKET_BASE = "wss://events.7tv.io/v3";
+    public static final String STV_API_BASE = "https://7tv.io/v3";
+    public static final String STV_API_USER_ENDPOINT = STV_API_BASE + "/users/twitch/%s";
+    public static final String STV_API_SEVENTV_USER_ENDPOINT = STV_API_BASE + "/users/%s";
+    public static final String STV_API_EMOTESET_ENDPOINT = STV_API_BASE + "/emote-sets/%s";
 }
