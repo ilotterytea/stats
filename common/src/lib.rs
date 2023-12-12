@@ -1,3 +1,6 @@
+pub mod models;
+pub mod schema;
+
 pub fn add(left: usize, right: usize) -> usize {
     left + right
 }
