@@ -1,17 +1,12 @@
 pub mod models;
 pub mod schema;
+use std::env;
 
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+pub use diesel::prelude::*;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub fn establish_connection() -> PgConnection {
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+    PgConnection::establish(&database_url)
+        .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
 }
