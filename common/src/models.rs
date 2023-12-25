@@ -11,6 +11,13 @@ pub struct Channel {
     pub opt_outed_at: Option<NaiveDateTime>,
 }
 
+#[derive(Insertable)]
+#[diesel(table_name = channels)]
+pub struct NewChannel {
+    pub alias_id: i32,
+    pub alias_name: String,
+}
+
 #[derive(Queryable, Identifiable)]
 pub struct User {
     pub id: i32,
@@ -20,7 +27,14 @@ pub struct User {
     pub opt_outed_at: Option<NaiveDateTime>,
 }
 
-#[derive(diesel_derive_enum::DbEnum, Debug, PartialEq)]
+#[derive(Insertable)]
+#[diesel(table_name = users)]
+pub struct NewUser {
+    pub alias_id: i32,
+    pub alias_name: String,
+}
+
+#[derive(diesel_derive_enum::DbEnum, Debug, PartialEq, Clone)]
 #[ExistingTypePath = "crate::schema::sql_types::EmoteProviderType"]
 pub enum EmoteType {
     Twitch,
@@ -29,13 +43,20 @@ pub enum EmoteType {
     SevenTV,
 }
 
-#[derive(Queryable, Identifiable)]
+#[derive(Queryable, Identifiable, Clone)]
 pub struct Emote {
     pub id: i32,
     pub alias_id: String,
     pub alias_type: EmoteType,
     pub is_global: bool,
     pub spotted_at: NaiveDateTime,
+}
+
+#[derive(Insertable)]
+#[diesel(table_name = emotes)]
+pub struct NewEmote {
+    pub alias_id: String,
+    pub alias_type: EmoteType,
 }
 
 #[derive(Queryable, Identifiable, Associations)]
@@ -51,6 +72,14 @@ pub struct ChannelEmote {
     pub removed_at: Option<NaiveDateTime>,
 }
 
+#[derive(Insertable)]
+#[diesel(table_name = channel_emotes)]
+pub struct NewChannelEmote {
+    pub emote_id: i32,
+    pub channel_id: i32,
+    pub name: String,
+}
+
 #[derive(Queryable, Identifiable, Associations)]
 #[diesel(belongs_to(Channel, foreign_key = channel_id))]
 #[diesel(belongs_to(User, foreign_key = user_id))]
@@ -64,4 +93,12 @@ pub struct EmoteUsage {
     pub usage_count: i32,
     pub first_use_at: NaiveDateTime,
     pub last_use_at: NaiveDateTime,
+}
+
+#[derive(Insertable)]
+#[diesel(table_name = emote_usage)]
+pub struct NewEmoteUsage {
+    pub emote_id: i32,
+    pub channel_id: i32,
+    pub user_id: i32,
 }
