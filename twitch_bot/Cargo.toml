@@ -13,4 +13,4 @@ edition.workspace = true
 dotenvy = "0.15.7"
 tokio = { version = "1.35.0", features = ["full"] }
 twitch-irc = "5.0.1"
-stats_common = { path = "../common" }
+common = { path = "../common" }
