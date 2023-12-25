@@ -19,7 +19,7 @@ eyre = "0.6.11"
 tungstenite = "0.21.0"
 tokio-tungstenite = "0.21.0"
 serde_json = "1.0.108"
-twitch_api = { version = "0.7.0-rc.7", features = ["twitch_oauth2", "reqwest", "eventsub"] }
+twitch_api = { version = "0.7.0-rc.7", features = ["twitch_oauth2", "reqwest", "eventsub", "helix"] }
 futures = "0.3.30"
 futures-util = "0.3.30"
 serde = { version = "1.0.193", features = ["derive"] }

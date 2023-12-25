@@ -1425,6 +1425,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "08be17cac4dd00fc643cb21adc349573a4b882e07d296ca5b4b0178343d48b42"
 dependencies = [
  "aliri_braid",
+ "async-trait",
  "displaydoc",
  "futures",
  "http 0.2.11",
