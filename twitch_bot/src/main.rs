@@ -1,8 +1,12 @@
-use std::sync::Arc;
+use std::{env, sync::Arc};
 
 use common::{establish_connection, models::Channel};
 use tokio::sync::Mutex;
-use twitch_api::types::UserId;
+use twitch_api::{
+    twitch_oauth2::{AccessToken, UserToken},
+    types::UserId,
+    HelixClient,
+};
 use twitch_irc::{
     login::StaticLoginCredentials, message::ServerMessage, ClientConfig, SecureTCPTransport,
     TwitchIRCClient,
@@ -29,6 +33,25 @@ pub async fn main() {
     let (mut incoming_messages, irc_client) =
         TwitchIRCClient::<SecureTCPTransport, StaticLoginCredentials>::new(config);
 
+    let reqwest_client = reqwest::Client::default();
+
+    let helix_token =
+        Arc::new(
+            match UserToken::from_token(
+                &reqwest_client,
+                AccessToken::new(env::var("BOT_ACCESS_TOKEN").unwrap_or_else(|_| {
+                    panic!("No BOT_ACCESS_TOKEN value specified in .env file!")
+                })),
+            )
+            .await
+            {
+                Ok(token) => token,
+                Err(e) => panic!("Failed to construct user token: {}", e),
+            },
+        );
+
+    let helix_client = Arc::new(HelixClient::with_client(reqwest_client.clone()));
+
     let conn = &mut establish_connection();
 
     let channel_ids: Vec<i32> = ch::channels
@@ -42,7 +65,23 @@ pub async fn main() {
         .map(|x| UserId::new(x.to_string()))
         .collect::<Vec<UserId>>();
 
-    let reqwest_client = reqwest::Client::default();
+    for channel_id in &channel_ids {
+        if let Ok(Some(user)) = helix_client
+            .get_user_from_id(channel_id, &*helix_token)
+            .await
+        {
+            irc_client
+                .join(user.login.to_string())
+                .expect("Failed to join a channel");
+
+            println!("[TWITCH IRC] Successfully joined #{}", &user.login);
+        } else {
+            println!(
+                "[TWITCH IRC] Failed to get user data with ID {} when joining channels",
+                channel_id
+            );
+        }
+    }
 
     let seventv_api_client = Arc::new(SevenTVAPIClient::new(reqwest_client));
 
