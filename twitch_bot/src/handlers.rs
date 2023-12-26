@@ -27,7 +27,7 @@ pub async fn handle_chat_messages(message: PrivmsgMessage) {
     let user = us::users
         .filter(us::alias_id.eq(&user_alias_id))
         .first::<User>(conn)
-        .unwrap_or({
+        .unwrap_or_else(|_| {
             insert_into(us::users)
                 .values([NewUser {
                     alias_id: user_alias_id,
