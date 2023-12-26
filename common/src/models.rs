@@ -1,8 +1,9 @@
 use crate::schema::*;
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
+use serde::Serialize;
 
-#[derive(Queryable, Identifiable)]
+#[derive(Queryable, Identifiable, Serialize)]
 pub struct Channel {
     pub id: i32,
     pub alias_id: i32,
@@ -18,7 +19,7 @@ pub struct NewChannel {
     pub alias_name: String,
 }
 
-#[derive(Queryable, Identifiable)]
+#[derive(Queryable, Identifiable, Serialize)]
 pub struct User {
     pub id: i32,
     pub alias_id: i32,
@@ -34,7 +35,7 @@ pub struct NewUser {
     pub alias_name: String,
 }
 
-#[derive(diesel_derive_enum::DbEnum, Debug, PartialEq, Clone)]
+#[derive(diesel_derive_enum::DbEnum, Debug, PartialEq, Clone, Serialize)]
 #[ExistingTypePath = "crate::schema::sql_types::EmoteProviderType"]
 pub enum EmoteType {
     Twitch,
@@ -43,7 +44,7 @@ pub enum EmoteType {
     SevenTV,
 }
 
-#[derive(Queryable, Identifiable, Clone)]
+#[derive(Queryable, Identifiable, Clone, Serialize)]
 pub struct Emote {
     pub id: i32,
     pub alias_id: String,
@@ -59,7 +60,7 @@ pub struct NewEmote {
     pub alias_type: EmoteType,
 }
 
-#[derive(Queryable, Identifiable, Associations)]
+#[derive(Queryable, Identifiable, Associations, Serialize)]
 #[diesel(belongs_to(Channel, foreign_key = channel_id))]
 #[diesel(belongs_to(Emote, foreign_key = emote_id))]
 #[diesel(table_name = channel_emotes)]
@@ -80,7 +81,7 @@ pub struct NewChannelEmote {
     pub name: String,
 }
 
-#[derive(Queryable, Identifiable, Associations)]
+#[derive(Queryable, Identifiable, Associations, Serialize)]
 #[diesel(belongs_to(Channel, foreign_key = channel_id))]
 #[diesel(belongs_to(User, foreign_key = user_id))]
 #[diesel(belongs_to(Emote, foreign_key = emote_id))]
