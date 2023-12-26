@@ -21,7 +21,8 @@ use common::{
     establish_connection, insert_into,
     models::{Channel, ChannelEmote, Emote, EmoteType, NewChannelEmote, NewEmote},
     schema::{channel_emotes::dsl as che, channels::dsl as ch, emotes::dsl as em},
-    update, BelongingToDsl, ExpressionMethods, NaiveDateTime, QueryDsl, RunQueryDsl, Utc,
+    update, BelongingToDsl, ExpressionMethods, NaiveDateTime, PgConnection, QueryDsl, RunQueryDsl,
+    Utc,
 };
 
 use self::{api::SevenTVAPIClient, schema::*};
@@ -363,11 +364,9 @@ impl SevenTVWebsocketClient {
     }
 
     async fn listen_channel(&mut self, channel_id: UserId) -> Result<(), eyre::Error> {
-        if let Some(user) = self
-            .api
-            .get_user_by_twitch_id(channel_id.clone().take())
-            .await
-        {
+        let id = channel_id.clone().take();
+
+        if let Some(user) = self.api.get_user_by_twitch_id(id.clone()).await {
             let emote_set_id = user.emote_set.id;
 
             let data = Payload {
@@ -386,6 +385,14 @@ impl SevenTVWebsocketClient {
                 .await?;
 
             println!("Listening 7TV events for {}'s emote set", user.username);
+
+            let conn = &mut establish_connection();
+            let channel: Channel = ch::channels
+                .filter(ch::alias_id.eq(id.parse::<i32>().unwrap()))
+                .get_result(conn)
+                .expect("Failed to get a channel");
+
+            scan_emote_set(conn, self.api.clone(), channel).await;
 
             let mut data = self.data.lock().await;
             data.listening_channel_ids.push(channel_id);
@@ -413,5 +420,88 @@ impl SevenTVWebsocketClient {
             .await?;
 
         Ok(())
+    }
+}
+
+pub async fn scan_emote_set(conn: &mut PgConnection, api: Arc<SevenTVAPIClient>, channel: Channel) {
+    let channel_emotes: Vec<ChannelEmote> = ChannelEmote::belonging_to(&channel)
+        .get_results(conn)
+        .expect("Failed to get channel emotes");
+
+    let emotes: Vec<Emote> = em::emotes.get_results(conn).expect("Failed to get emotes");
+
+    if let Some(seventv_channel) = api
+        .get_user_by_twitch_id(channel.alias_id.to_string())
+        .await
+    {
+        let emote_set = seventv_channel.emote_set;
+
+        for es_emote in &emote_set.emotes {
+            let emote = match emotes
+                .iter()
+                .find(|x| x.alias_type == EmoteType::SevenTV && x.alias_id.eq(&es_emote.id))
+            {
+                Some(v) => v.clone(),
+                None => insert_into(em::emotes)
+                    .values([NewEmote {
+                        alias_id: es_emote.id.clone(),
+                        alias_type: EmoteType::SevenTV,
+                    }])
+                    .get_result::<Emote>(conn)
+                    .expect("Failed to insert a new emote"),
+            };
+
+            match channel_emotes.iter().find(|x| x.emote_id.eq(&emote.id)) {
+                Some(v) => {
+                    if v.name.ne(&es_emote.name) {
+                        update(che::channel_emotes.find(&v.id))
+                            .set(che::name.eq(&es_emote.name))
+                            .execute(conn)
+                            .expect("Failed to update a channel emote");
+                    }
+
+                    if v.removed_at.is_some() {
+                        update(che::channel_emotes.find(&v.id))
+                            .set(che::removed_at.eq(None::<NaiveDateTime>))
+                            .execute(conn)
+                            .expect("Failed to update a channel emote");
+                    }
+                }
+                None => {
+                    insert_into(che::channel_emotes)
+                        .values([NewChannelEmote {
+                            emote_id: emote.id,
+                            channel_id: channel.id,
+                            name: es_emote.name.clone(),
+                        }])
+                        .execute(conn)
+                        .expect("Failed to insert a new channel emote");
+                }
+            }
+        }
+
+        let emotes = emotes
+            .iter()
+            .filter(|x| {
+                channel_emotes.iter().any(|y| y.emote_id == x.id)
+                    && x.alias_type == EmoteType::SevenTV
+            })
+            .collect::<Vec<&Emote>>();
+
+        for channel_emote in channel_emotes {
+            if let Some(emote) = emotes.iter().find(|x| x.id == channel_emote.emote_id) {
+                if !emote_set.emotes.iter().any(|x| x.id.eq(&emote.alias_id)) {
+                    update(che::channel_emotes.find(&channel_emote.id))
+                        .set(che::removed_at.eq(Utc::now().naive_utc()))
+                        .execute(conn)
+                        .expect("Failed to update a channel emote");
+                }
+            }
+        }
+
+        println!(
+            "[7TV EVENTAPI] Emotes for channel ID {} have been successfully updated!",
+            channel.id
+        );
     }
 }
