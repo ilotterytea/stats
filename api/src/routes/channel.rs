@@ -6,7 +6,6 @@ use common::{
 
 use super::models::Response;
 
-#[get("/v1/channel/twitch/{id}")]
 pub async fn get_channel_by_twitch_id(name: web::Path<i32>) -> impl Responder {
     let conn = &mut establish_connection();
 

@@ -1,6 +1,8 @@
 use std::io::Result;
 
-use actix_web::{App, HttpServer};
+use actix_web::{web, App, HttpServer};
+
+use crate::routes::channel::*;
 
 mod routes;
 
@@ -10,8 +12,14 @@ async fn main() -> Result<()> {
 
     println!("Hello, world!");
 
-    HttpServer::new(|| App::new().service(crate::routes::channel::get_channel_by_twitch_id))
-        .bind(("127.0.0.1", 8080))?
-        .run()
-        .await
+    HttpServer::new(|| {
+        App::new().service(web::scope("/api").service(web::scope("/v1").service(
+            web::scope("/channel").service(web::scope("/twitch").service(
+                web::scope("/{name}").service(web::resource("").to(get_channel_by_twitch_id)),
+            )),
+        )))
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
 }
