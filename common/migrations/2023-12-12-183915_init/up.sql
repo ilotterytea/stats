@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS "users" (
   "opt_outed_at" TIMESTAMP
 );
 
-CREATE TYPE "emote_provider_type" AS ENUM ('ttv', 'bttv', 'ffz' ,'7tv');
+CREATE TYPE "emote_provider_type" AS ENUM ('twitch', 'better_ttv', 'franker_face_z' ,'seven_tv');
 
 CREATE TABLE IF NOT EXISTS "emotes" (
   "id" SERIAL NOT NULL PRIMARY KEY,
@@ -41,5 +41,5 @@ CREATE TABLE IF NOT EXISTS "emote_usage" (
   "user_id" INTEGER NOT NULL REFERENCES "users"("id"),
   "usage_count" INTEGER NOT NULL DEFAULT 1,
   "first_use_at" TIMESTAMP NOT NULL DEFAULT timezone('utc', now()),
-  "last_use_at" TIMESTAMP NOT NULL
+  "last_use_at" TIMESTAMP NOT NULL DEFAULT timezone('utc', now())
 );
