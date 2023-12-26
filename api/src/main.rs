@@ -21,7 +21,14 @@ async fn main() -> Result<()> {
                             web::scope("/{name}")
                                 .service(web::resource("").to(get_channel_by_twitch_id))
                                 .service(
-                                    web::resource("/emotes").to(get_channel_emotes_by_twitch_id),
+                                    web::scope("/emotes")
+                                        .service(
+                                            web::resource("").to(get_channel_emotes_by_twitch_id),
+                                        )
+                                        .service(
+                                            web::resource("/usage")
+                                                .to(get_emote_usage_by_twitch_id),
+                                        ),
                                 ),
                         ),
                     ),
