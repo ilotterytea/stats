@@ -1,10 +1,10 @@
-use std::{env, sync::Arc};
+use std::{env, sync::Arc, time::Duration};
 
 use common::{establish_connection, models::Channel};
 use tokio::sync::Mutex;
 use twitch_api::{
     twitch_oauth2::{AccessToken, UserToken},
-    types::UserId,
+    types::{User, UserId},
     HelixClient,
 };
 use twitch_irc::{
@@ -28,6 +28,7 @@ mod providers;
 #[tokio::main]
 pub async fn main() {
     println!("Hello, world!");
+    dotenvy::dotenv().expect("Failed to load .env file");
 
     let config = ClientConfig::default();
     let (mut incoming_messages, irc_client) =
