@@ -273,6 +273,9 @@ name = "api"
 version = "1.0.0"
 dependencies = [
  "actix-web",
+ "common",
+ "dotenvy",
+ "serde",
 ]
 
 [[package]]
@@ -408,6 +411,7 @@ dependencies = [
  "iana-time-zone",
  "js-sys",
  "num-traits",
+ "serde",
  "wasm-bindgen",
  "windows-targets 0.48.5",
 ]
@@ -419,6 +423,7 @@ dependencies = [
  "chrono",
  "diesel",
  "diesel-derive-enum",
+ "serde",
 ]
 
 [[package]]
