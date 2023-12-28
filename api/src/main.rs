@@ -6,7 +6,7 @@ use twitch_api::{
     HelixClient,
 };
 
-use crate::routes::channel::*;
+use crate::routes::{channel::*, *};
 
 mod routes;
 
@@ -46,24 +46,27 @@ async fn main() -> Result<()> {
     HttpServer::new(move || {
         App::new().app_data(shared_twitch_data.clone()).service(
             web::scope("/api").service(
-                web::scope("/v1").service(
-                    web::scope("/channel").service(
-                        web::scope("/twitch").service(
-                            web::scope("/{name}")
-                                .service(web::resource("").to(get_channel_by_twitch_id))
-                                .service(
-                                    web::scope("/emotes")
-                                        .service(
-                                            web::resource("").to(get_channel_emotes_by_twitch_id),
-                                        )
-                                        .service(
-                                            web::resource("/usage")
-                                                .to(get_emote_usage_by_twitch_id),
-                                        ),
-                                ),
+                web::scope("/v1")
+                    .service(
+                        web::scope("/channel").service(
+                            web::scope("/twitch").service(
+                                web::scope("/{name}")
+                                    .service(web::resource("").to(get_channel_by_twitch_id))
+                                    .service(
+                                        web::scope("/emotes")
+                                            .service(
+                                                web::resource("")
+                                                    .to(get_channel_emotes_by_twitch_id),
+                                            )
+                                            .service(
+                                                web::resource("/usage")
+                                                    .to(get_emote_usage_by_twitch_id),
+                                            ),
+                                    ),
+                            ),
                         ),
-                    ),
-                ),
+                    )
+                    .service(web::resource("/join").post(join_channel)),
             ),
         )
     })

@@ -1,5 +1,5 @@
 use common::NaiveDateTime;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize)]
 pub struct Response<T> {
@@ -14,4 +14,9 @@ pub struct EmoteUsage {
     pub usage_count: i32,
     pub first_use_at: NaiveDateTime,
     pub last_use_at: NaiveDateTime,
+}
+
+#[derive(Deserialize)]
+pub struct JoinPartRequest {
+    pub twitch_id: u32,
 }
