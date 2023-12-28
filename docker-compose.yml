@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  db:
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_NAME: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    image: postgres:16.1-bullseye
+    expose:
+      - 5432
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -h db -p 5432 -U ${POSTGRES_USER}"
+        ]
+
+  migration:
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+    build:
+      dockerfile: ./docker/migration.Dockerfile
+    command: "diesel setup --database-url \"postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB}\" --migration-dir \".\""
+    env_file:
+      - .env
+    links:
+      - db
+
+  api:
+    restart: on-failure
+    depends_on:
+      - db
+      - migration
+    build:
+      dockerfile: ./docker/bin.Dockerfile
+      args:
+        BIN_NAME: api
+    command: "cargo run --release --package api"
+    env_file:
+      - .env
+    links:
+      - db
+    ports:
+      - "8084:8080"
+
+  twitch_bot:
+    restart: on-failure
+    depends_on:
+      - db
+      - migration
+    build:
+      dockerfile: ./docker/bin.Dockerfile
+      args:
+        BIN_NAME: twitch_bot
+    command: "cargo run --release --package twitch_bot"
+    env_file:
+      - .env
+    links:
+      - db
