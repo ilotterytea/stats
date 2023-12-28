@@ -66,7 +66,8 @@ async fn main() -> Result<()> {
                             ),
                         ),
                     )
-                    .service(web::resource("/join").post(join_channel)),
+                    .service(web::resource("/join").post(join_channel))
+                    .service(web::resource("/part").post(part_channel)),
             ),
         )
     })

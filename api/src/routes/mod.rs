@@ -1,9 +1,9 @@
 use actix_web::{web, HttpResponse, Responder, Result};
 use common::{
-    establish_connection, insert_into,
+    delete, establish_connection, insert_into,
     models::{Channel, NewChannel},
     schema::channels::dsl as ch,
-    ExpressionMethods, QueryDsl, RunQueryDsl,
+    update, ExpressionMethods, QueryDsl, RunQueryDsl, Utc,
 };
 use twitch_api::types::UserIdRef;
 
@@ -29,7 +29,7 @@ pub async fn join_channel(
         return Ok(HttpResponse::Conflict().json(Response {
             status_code: 409,
             message: Some(format!(
-                "Attempting to join a channel that is already joined."
+                "Attempting to join a channel that is already joined or opted out of."
             )),
             data: None::<i32>,
         }));
@@ -58,6 +58,48 @@ pub async fn join_channel(
     Ok(HttpResponse::NotFound().json(Response {
         status_code: 404,
         message: Some(format!("Twitch ID {} doesn't exist", data.twitch_id)),
+        data: None::<i32>,
+    }))
+}
+
+pub async fn part_channel(data: web::Json<JoinPartRequest>) -> Result<HttpResponse> {
+    let conn = &mut establish_connection();
+
+    let id = data.twitch_id as i32;
+
+    if let Ok(c) = ch::channels
+        .filter(ch::alias_id.eq(&id))
+        .get_result::<Channel>(conn)
+    {
+        if c.opt_outed_at.is_some() {
+            return Ok(HttpResponse::Ok().json(Response {
+                status_code: 200,
+                message: Some(format!("Has already parted {}'s channel!", c.alias_name)),
+                data: None::<i32>,
+            }));
+        } else {
+            update(ch::channels.find(&c.id))
+                .set(ch::opt_outed_at.eq(Utc::now().naive_utc()))
+                .execute(conn)
+                .expect("Failed to update a channel");
+
+            return Ok(HttpResponse::Ok().json(Response {
+                status_code: 200,
+                message: Some(format!(
+                    "Successfully parted from {}'s channel",
+                    c.alias_name
+                )),
+                data: None::<i32>,
+            }));
+        }
+    }
+
+    Ok(HttpResponse::NotFound().json(Response {
+        status_code: 404,
+        message: Some(format!(
+            "Twitch ID {} doesn't exist or is not joined",
+            data.twitch_id
+        )),
         data: None::<i32>,
     }))
 }
