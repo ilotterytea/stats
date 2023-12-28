@@ -275,7 +275,9 @@ dependencies = [
  "actix-web",
  "common",
  "dotenvy",
+ "reqwest",
  "serde",
+ "twitch_api",
 ]
 
 [[package]]
