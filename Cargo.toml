@@ -1,0 +1,9 @@
+[workspace]
+members = ["common", "api", "twitch_bot"]
+
+[workspace.package]
+version = "1.0.0"
+authors = ["ilotterytea <ilotterytea@pm.me>"]
+edition = "2021"
+publish = false
+repository = "https://github.com/ilotterytea/stats"
