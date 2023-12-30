@@ -13,7 +13,7 @@ use twitch_irc::{
 };
 
 use crate::{
-    handlers::handle_chat_messages,
+    handlers::{handle_chat_messages, handle_new_channels},
     providers::{
         seventv::{api::SevenTVAPIClient, SevenTVWebsocketClient},
         WebsocketData,
@@ -33,6 +33,8 @@ pub async fn main() {
     let config = ClientConfig::default();
     let (mut incoming_messages, irc_client) =
         TwitchIRCClient::<SecureTCPTransport, StaticLoginCredentials>::new(config);
+
+    let irc_client = Arc::new(irc_client);
 
     let reqwest_client = reqwest::Client::default();
 
@@ -101,6 +103,18 @@ pub async fn main() {
         seventv_websocket.run().await.unwrap();
     });
 
+    let seventv_data_update_handle = tokio::spawn({
+        let seventv_websocket_data = seventv_websocket_data.clone();
+        let irc_client = irc_client.clone();
+        async move {
+            loop {
+                handle_new_channels(seventv_websocket_data.clone(), irc_client.clone()).await;
+
+                tokio::time::sleep(Duration::from_secs(10)).await;
+            }
+        }
+    });
+
     let irc_handle = tokio::spawn({
         async move {
             while let Some(message) = incoming_messages.recv().await {
@@ -113,5 +127,9 @@ pub async fn main() {
         }
     });
 
-    tokio::join!(irc_handle, seventv_websocket_handle);
+    tokio::join!(
+        irc_handle,
+        seventv_websocket_handle,
+        seventv_data_update_handle
+    );
 }

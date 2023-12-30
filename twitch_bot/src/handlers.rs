@@ -1,10 +1,18 @@
+use std::{str::FromStr, sync::Arc};
+
 use common::{
     establish_connection, insert_into,
     models::{Channel, ChannelEmote, EmoteUsage, NewEmoteUsage, NewUser, User},
     schema::{channels::dsl as ch, emote_usage::dsl as emu, users::dsl as us},
     update, BelongingToDsl, ExpressionMethods, QueryDsl, RunQueryDsl, Utc,
 };
-use twitch_irc::message::PrivmsgMessage;
+use tokio::sync::Mutex;
+use twitch_api::types::UserId;
+use twitch_irc::{
+    login::StaticLoginCredentials, message::PrivmsgMessage, SecureTCPTransport, TwitchIRCClient,
+};
+
+use crate::providers::WebsocketData;
 
 pub async fn handle_chat_messages(message: PrivmsgMessage) {
     let conn = &mut establish_connection();
@@ -89,4 +97,38 @@ pub async fn handle_chat_messages(message: PrivmsgMessage) {
         .values(new_emote_usages)
         .execute(conn)
         .expect("Failed to create new emote usages");
+}
+
+pub async fn handle_new_channels(
+    data: Arc<Mutex<WebsocketData>>,
+    irc_client: Arc<TwitchIRCClient<SecureTCPTransport, StaticLoginCredentials>>,
+) {
+    let conn = &mut establish_connection();
+
+    if let Ok(channels) = ch::channels.get_results::<Channel>(conn) {
+        let mut data = data.lock().await;
+
+        let alive_channels = channels
+            .iter()
+            .filter(|x| x.opt_outed_at.is_none())
+            .filter(|x| {
+                let x = UserId::new(x.alias_id.to_string());
+
+                !data.listening_channel_ids.iter().any(|y| y.eq(&x))
+                    && !data.awaiting_channel_ids.iter().any(|y| y.eq(&x))
+            })
+            .collect::<Vec<&Channel>>();
+
+        for channel in alive_channels {
+            data.awaiting_channel_ids
+                .push(UserId::new(channel.alias_id.to_string()));
+
+            if let Ok(_) = irc_client.join(channel.alias_name.clone()) {
+                println!(
+                    "[TWITCH IRC] Successfully joined {}'s chat room!",
+                    channel.alias_name
+                );
+            }
+        }
+    }
 }
